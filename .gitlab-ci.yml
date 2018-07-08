@@ -1,0 +1,47 @@
+stages:
+ - build-mysql
+ - mysql-to-postgres
+ - build-postgres
+
+variables:
+  MYSQL_DATABASE: f1
+  MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+image: docker
+before_script:
+ - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY || true
+
+build-mysql:
+  stage: build-mysql
+  services:
+   - docker:dind
+  script:
+   - cd mysql
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/mysql .
+   - docker push $CI_REGISTRY_IMAGE/mysql
+
+mysql-to-postgres:
+  stage: mysql-to-postgres
+  image: alpine:3.8
+  services:
+  - name: $CI_REGISTRY_IMAGE/mysql
+    alias: mysql
+  script:
+   - apk add --no-cache mysql-client python wget
+   - mysqldump -h mysql --compatible=postgresql --default-character-set=utf8 -r f1.mysql -u root f1
+   - wget https://raw.githubusercontent.com/lanyrd/mysql-postgresql-converter/master/db_converter.py
+   - python db_converter.py f1.mysql f1.psql
+   - sed -i 's/0000-00-00/1970-01-01/g' f1.psql
+  artifacts:
+    paths:
+     - f1.psql
+    expire_in: 1 month
+
+postgres:
+  stage: build-postgres
+  services:
+   - docker:dind
+  script:
+   - mv f1.psql postgres/
+   - cd postgres
+   - docker build --no-cache -t $CI_REGISTRY_IMAGE/postgres .
+   - docker push $CI_REGISTRY_IMAGE/postgres

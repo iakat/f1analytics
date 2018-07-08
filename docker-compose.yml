@@ -1,10 +1,7 @@
 version: '2'
 services:
-  mysql:
-    build: mysql/
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: f1
+  f1db:
+    image: registry.gitlab.com/chauffer/f1analytics/postgres
   postgres:
     image: postgres:10-alpine
     volumes:
