@@ -1,0 +1,22 @@
+version: '2'
+services:
+  mysql:
+    build: mysql/
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: f1
+  postgres:
+    image: postgres:10-alpine
+    volumes:
+     - ./pgdata:/var/lib/postgresql/data
+  metabase:
+    image: metabase/metabase:v0.29.3
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: postgres
+      MB_DB_PORT: 5432
+      MB_DB_USER: postgres
+      MB_DB_PASS: postgres
+      MB_DB_HOST: postgres
+    ports:
+      - 3000
