@@ -8,12 +8,9 @@ build-postgres:
    - wget -q https://raw.githubusercontent.com/lanyrd/mysql-postgresql-converter/master/db_converter.py
    - wget -q http://ergast.com/downloads/f1db_postgres.sql.gz
    - gzip -d f1db_postgres.sql.gz
-   - python db_converter.py f1db_postgres.sql f1.psql > /dev/null
-   - sed -i 's/0000-00-00/1970-01-01/g' f1.psql
+   - python db_converter.py f1db_postgres.sql 00_f1.sql > /dev/null
+   - rm f1db_postgres.sql
+   - sed -i 's/0000-00-00/1970-01-01/g' 00_f1.sql
    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
    - docker build -t $CI_REGISTRY_IMAGE/postgres .
    - docker push $CI_REGISTRY_IMAGE/postgres
-  artifacts:
-    paths:
-     - f1.psql
-    expire_in: 1 month
