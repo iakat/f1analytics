@@ -9,6 +9,7 @@ Usage:
 - Find the port of the exposed `metabase` container
 - Browse to `http://localhost:port`
 - Register a local metabase account
+- Register the database, by default available at hostname `f1db`. (Database credentials readonly:readonly)
 - Have fun!
 
 # Credits
